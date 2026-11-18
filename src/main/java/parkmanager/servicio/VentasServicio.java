@@ -11,6 +11,7 @@ import parkmanager.modelo.PaseAnual;
 import parkmanager.modelo.TipoBoleto;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -39,21 +40,22 @@ public class VentasServicio {
         return boleto.getTipo();
     }
 
-    public synchronized Compra registrarCompra(String tipo, Integer cantidad) {
+    public synchronized Compra registrarCompra(String tipo, BigInteger cantidad) {
         if (cantidad == null) {
             throw new ReglaNegocioException("SOLICITUD_INVALIDA", "Falta la cantidad de boletos");
         }
         Boleto boleto = buscarBoleto(tipo);
-        if (cantidad < 1 || cantidad > 10) {
+        if (cantidad.signum() <= 0 || cantidad.compareTo(BigInteger.TEN) > 0) {
             throw new ReglaNegocioException("CANTIDAD_INVALIDA", "La cantidad debe estar entre 1 y 10");
         }
 
+        int cantidadBoletos = cantidad.intValue();
         BigDecimal precioFinal = boleto.getPrecioFinal();
-        BigDecimal total = precioFinal.multiply(BigDecimal.valueOf(cantidad));
+        BigDecimal total = precioFinal.multiply(BigDecimal.valueOf(cantidadBoletos));
         ingresosAcumulados = ingresosAcumulados.add(total);
-        boletosAcumulados += cantidad;
+        boletosAcumulados += cantidadBoletos;
 
-        return new Compra(boleto.getTipo(), cantidad, boleto.getPrecioBase(), boleto.getDescuento(),
+        return new Compra(boleto.getTipo(), cantidadBoletos, boleto.getPrecioBase(), boleto.getDescuento(),
                 precioFinal, total, ingresosAcumulados);
     }
 
