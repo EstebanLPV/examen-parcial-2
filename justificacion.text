@@ -1,0 +1,11 @@
+Justificación del diseño de ParkManager
+
+Usé una clase abstracta Boleto porque las cuatro modalidades comparten el cálculo del descuento. Cada subclase implementa getPrecioBase() con su propia tarifa. El servicio trabaja con referencias de tipo Boleto y Java llama al método de la modalidad correspondiente.
+
+El constructor de Boleto fija el tipo y el descuento se guarda en un campo privado. VentasServicio usa un EnumMap que guarda un boleto por modalidad. Así cada modalidad tiene su propio descuento y quitarlo consiste en volver a ponerlo en cero.
+
+Usé BigDecimal para calcular montos en centavos. Redondeo el precio unitario a dos decimales antes de multiplicarlo por la cantidad. La compra devuelve los valores que se usaron en ese momento, así que un cambio posterior de descuento solo afecta las siguientes compras.
+
+El servicio valida la solicitud antes de modificar el total de boletos e ingresos. Sus operaciones están sincronizadas para que una compra use un solo descuento y para evitar que dos compras simultáneas sobrescriban los acumulados. Los datos se guardan en memoria porque el enunciado solo requiere conservarlos mientras la aplicación está en ejecución.
+
+Separé el modelo, el servicio, la API y la excepción de negocio en paquetes. El controlador recibe y devuelve JSON. El modelo calcula el precio unitario y el servicio coordina la compra y actualiza los acumulados. El manejador central devuelve los errores HTTP 400 con un código y un mensaje.
