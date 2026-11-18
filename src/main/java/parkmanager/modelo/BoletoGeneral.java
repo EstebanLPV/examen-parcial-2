@@ -1,0 +1,16 @@
+package parkmanager.modelo;
+
+import java.math.BigDecimal;
+
+public class BoletoGeneral extends Boleto {
+    private static final BigDecimal PRECIO_BASE = new BigDecimal("900.00");
+
+    public BoletoGeneral() {
+        super(TipoBoleto.GENERAL);
+    }
+
+    @Override
+    public BigDecimal getPrecioBase() {
+        return PRECIO_BASE;
+    }
+}
